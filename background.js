@@ -3,124 +3,171 @@ console.log("Background service worker loaded");
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log("Received message in background:", request);
 
-  if (request.action !== "processText") return;
-  (async () => {
-    try {
-      // Get API key from secure storage
-      const storageResult = await chrome.storage.sync.get(['openaiApiKey']);
-      const apiKey = storageResult.openaiApiKey;
-      
-      if (!apiKey) {
-        sendResponse({ result: "Error: Please set your OpenAI API key in the extension settings." });
-        return;
-      }
+  if (request.action === "processText") {
+    handleAnalysisRequest(request, sendResponse);
+  } else if (request.action === "testApiKey") {
+    handleApiKeyTest(request, sendResponse);
+  } else if (request.action === "getCarbonData") {
+    handleCarbonDataRequest(request, sendResponse);
+  }
+  
+  return true; // Keep channel open
+});
 
-      console.log("API key is set:", Boolean(apiKey));
-      
-      // Perform external research if company name is available
-      let externalResearch = "";
-      if (request.companyName) {
-        console.log("Performing external research for:", request.companyName);
-        externalResearch = await performExternalResearch(request.companyName);
-      }
-      
-      // Combine website data with external research
-      const combinedAnalysisText = request.text + (externalResearch ? `\n\nEXTERNAL RESEARCH FINDINGS:\n${externalResearch}` : "");
-      
-      console.log("Sending request to OpenAI...");
-      const chatResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo-0125",
-          messages: [
-            {
-              role: "system",
-              content: `You are a comprehensive sustainability evaluator with access to both company website data and external research. Analyze ALL provided information to give the most accurate assessment possible.
+async function handleAnalysisRequest(request, sendResponse) {
+  try {
+    // Get API key from secure storage
+    const storageResult = await chrome.storage.sync.get(['openaiApiKey']);
+    const apiKey = storageResult.openaiApiKey;
+    
+    if (!apiKey) {
+      sendResponse({ result: "Error: Please set your OpenAI API key in the extension settings." });
+      return;
+    }
+
+    console.log("API key is set:", Boolean(apiKey));
+    
+    // Get analysis data
+    const analysisData = request.data || request;
+    const analysisText = analysisData.content || request.text || '';
+    const companyName = analysisData.companyName || request.companyName;
+    
+    // Perform external research if company name is available
+    let externalResearch = "";
+    if (companyName) {
+      console.log("Performing external research for:", companyName);
+      externalResearch = await performExternalResearch(companyName);
+    }
+    
+    // Combine website data with external research
+    const combinedAnalysisText = analysisText + (externalResearch ? `\n\nEXTERNAL RESEARCH FINDINGS:\n${externalResearch}` : "");
+    
+    console.log("Sending request to OpenAI...");
+    const chatResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo-0125",
+        messages: [
+          {
+            role: "system",
+            content: `You are a comprehensive sustainability evaluator with access to both company website data and external research. Analyze ALL provided information to give the most accurate assessment possible.
 
 ANALYSIS FACTORS:
-1. MATERIALS & SOURCING (25 points)
-   - Raw material sustainability (recycled, organic, renewable)
-   - Supply chain transparency and traceability
-   - Sourcing practices and geographic locations
-   - Third-party certifications (GOTS, OEKO-TEX, etc.)
-
-2. MANUFACTURING & PRODUCTION (25 points)
-   - Production methods and energy efficiency
-   - Factory conditions and worker treatment
-   - Manufacturing location and transportation impact
-   - Waste reduction and circular economy integration
-
-3. ENVIRONMENTAL IMPACT (25 points)
+1. ENVIRONMENTAL IMPACT (25 points)
    - Carbon footprint and emissions reduction
    - Water usage, pollution, and conservation
-   - Packaging sustainability and waste management
    - Renewable energy usage and climate commitments
+   - Waste reduction and circular economy integration
 
-4. SOCIAL RESPONSIBILITY (25 points)
+2. SOCIAL RESPONSIBILITY (25 points)
    - Labor practices and worker rights
    - Fair wages and working conditions
    - Community impact and social initiatives
    - Diversity, inclusion, and ethical business practices
 
-EXTERNAL RESEARCH INTEGRATION:
-- Cross-reference website claims with external sources
-- Consider industry reports, certifications, and third-party assessments
-- Account for any controversies or criticisms found
-- Validate sustainability claims against independent sources
+3. GOVERNANCE (25 points)
+   - Corporate transparency and reporting
+   - Ethical business practices
+   - Board diversity and independence
+   - Risk management and compliance
 
-RESPONSE FORMAT:
+4. MATERIALS & SOURCING (25 points)
+   - Raw material sustainability (recycled, organic, renewable)
+   - Supply chain transparency and traceability
+   - Third-party certifications (B-Corp, Fair Trade, etc.)
+   - Sourcing practices and supplier standards
+
+RESPONSE FORMAT (REQUIRED):
 Overall Score: XX / 100
 
 DETAILED BREAKDOWN:
-Materials & Sourcing: XX/25 - [analysis with external validation]
-Manufacturing: XX/25 - [analysis considering external findings]
-Environmental Impact: XX/25 - [analysis with third-party verification]
-Social Responsibility: XX/25 - [analysis including external reports]
-
-VERIFICATION STATUS:
-✓ Claims verified by external sources
-⚠ Claims require verification
-✗ Claims contradicted by external findings
+Environmental: XX/25 - [brief analysis]
+Social: XX/25 - [brief analysis]
+Governance: XX/25 - [brief analysis]
+Materials: XX/25 - [brief analysis]
 
 KEY FINDINGS:
-• [Notable positive practices with source verification]
-• [Areas of concern or inconsistencies]
-• [External certifications or recognition found]
-• [Any controversies or criticisms discovered]
+• [Finding 1]
+• [Finding 2]
+• [Finding 3]
 
-RECOMMENDATION: [Evidence-based recommendation for consumers with confidence level]`
-            },
-            { role: "user", content: combinedAnalysisText }
-          ],
-          temperature: 0.7
-        })
-      });
+IMPROVEMENTS NEEDED:
+• [Improvement 1]
+• [Improvement 2]
+• [Improvement 3]
 
-      console.log("HTTP status:", chatResponse.status);
-      const raw = await chatResponse.text();
-      console.log("Raw response body:", raw);
+CERTIFICATIONS FOUND: [list any certifications mentioned]
 
-      if (!chatResponse.ok) {
-        throw new Error(`HTTP ${chatResponse.status}`);
-      }
+CONFIDENCE: [High/Medium/Low] - [brief reason]`
+          },
+          { role: "user", content: combinedAnalysisText }
+        ],
+        temperature: 0.7
+      })
+    });
 
-      const data = JSON.parse(raw);
-      console.log("Parsed JSON:", data);
+    console.log("HTTP status:", chatResponse.status);
+    const raw = await chatResponse.text();
+    console.log("Raw response body:", raw);
 
-      const result = data.choices?.[0]?.message?.content;
-      sendResponse({ result });
-    } catch (error) {
-      console.error("OpenAI API error:", error);
-      sendResponse({ result: `Error: ${error.message}` });
+    if (!chatResponse.ok) {
+      throw new Error(`HTTP ${chatResponse.status}`);
     }
-  })();
 
-  return true; // keep channel open
-});
+    const data = JSON.parse(raw);
+    console.log("Parsed JSON:", data);
+
+    const result = data.choices?.[0]?.message?.content;
+    sendResponse({ result });
+  } catch (error) {
+    console.error("OpenAI API error:", error);
+    sendResponse({ result: `Error: ${error.message}` });
+  }
+}
+
+async function handleApiKeyTest(request, sendResponse) {
+  try {
+    const { provider, apiKey } = request;
+    
+    if (provider === 'openai') {
+      const response = await fetch("https://api.openai.com/v1/models", {
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        }
+      });
+      
+      if (response.ok) {
+        sendResponse({ success: true, message: "API key is valid" });
+      } else {
+        sendResponse({ success: false, message: "Invalid API key" });
+      }
+    } else {
+      sendResponse({ success: false, message: "Provider not supported yet" });
+    }
+  } catch (error) {
+    sendResponse({ success: false, message: error.message });
+  }
+}
+
+async function handleCarbonDataRequest(request, sendResponse) {
+  try {
+    // Simulate carbon data calculation
+    const carbonData = {
+      daily: Math.random() * 5,
+      weekly: Math.random() * 20,
+      monthly: Math.random() * 100
+    };
+    
+    sendResponse({ success: true, data: carbonData });
+  } catch (error) {
+    sendResponse({ success: false, message: error.message });
+  }
+}
 
 // External research functions
 async function performExternalResearch(companyName) {
