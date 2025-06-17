@@ -596,11 +596,46 @@ class EcoGuardPro {
       `;
     }).join('');
   }
-
+  
   loadCharts() {
-    // Implementation would go here for Chart.js integration
-    // This is a placeholder for the hackathon demo
-  }
+  // Weekly Analysis Trend chart
+  const trendCtx = document.getElementById('trend-chart').getContext('2d');
+  new Chart(trendCtx, {
+    type: 'line',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{
+        label: 'Score',
+        data: [65, 59, 80, 81, 56, 55, 70],
+        fill: false,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        tension: 0.1
+      }]
+    },
+    options: { responsive: true }
+  });
+
+  // Category Breakdown chart
+  const categoryCtx = document.getElementById('category-chart').getContext('2d');
+  new Chart(categoryCtx, {
+    type: 'pie',
+    data: {
+      labels: ['Energy', 'Transport', 'Waste', 'Water'],
+      datasets: [{
+        label: 'Category Breakdown',
+        data: [300, 50, 100, 80],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.7)',
+          'rgba(54, 162, 235, 0.7)',
+          'rgba(255, 206, 86, 0.7)',
+          'rgba(75, 192, 192, 0.7)'
+        ]
+      }]
+    },
+    options: { responsive: true }
+  });
+}
+
 
   loadCarbonTracker() {
     // Implementation would calculate and display carbon impact
