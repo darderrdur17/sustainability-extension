@@ -5,7 +5,6 @@
   <title>🌱 EcoGuard Pro</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="header">
@@ -55,6 +54,11 @@
         <div class="stat-value" id="industry-rank">--</div>
         <div class="stat-label">Industry Rank</div>
       </div>
+    </div>
+
+    <!-- Company Information Display -->
+    <div id="company-info" class="company-info" style="display: none;">
+      <!-- Company details will be populated by JS -->
     </div>
 
     <button id="checkButton" class="analyze-btn">
@@ -108,6 +112,13 @@
             <div class="breakdown-fill governance" id="gov-score"></div>
           </div>
           <span class="breakdown-value" id="gov-value">--</span>
+        </div>
+        <div class="breakdown-item">
+          <span class="breakdown-label">Materials</span>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill materials" id="materials-score"></div>
+          </div>
+          <span class="breakdown-value" id="materials-value">--</span>
         </div>
       </div>
     </div>
@@ -322,5 +333,6 @@
   <script src="dashboard.js"></script>
   <script src="gamification.js"></script>
   <script src="visualization.js"></script>
+  <script src="lib/chart.umd.js"></script>
 </body>
 </html>
