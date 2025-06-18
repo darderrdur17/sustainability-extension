@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>🌱 EcoGuard Pro</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <span class="eco-icon">🌱</span>
+      <h1>EcoGuard Pro</h1>
+      <div class="user-level">
+        <span class="level-badge" id="user-level">Eco Novice</span>
+        <div class="xp-bar">
+          <div class="xp-fill" id="xp-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="tab-container">
+    <button class="tab-btn active" data-tab="analysis">
+      <i class="fas fa-chart-line"></i> Analysis
+    </button>
+    <button class="tab-btn" data-tab="dashboard">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </button>
+    <button class="tab-btn" data-tab="compare">
+      <i class="fas fa-balance-scale"></i> Compare
+    </button>
+    <button class="tab-btn" data-tab="history">
+      <i class="fas fa-history"></i> History
+    </button>
+    <button class="tab-btn" data-tab="settings">
+      <i class="fas fa-cog"></i> Settings
+    </button>
+  </div>
+
+  <!-- Analysis Tab -->
+  <div class="tab-content active" id="analysis-tab">
+    <div class="quick-stats">
+      <div class="stat-item">
+        <div class="stat-value" id="current-score">--</div>
+        <div class="stat-label">Current Score</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="carbon-impact">--</div>
+        <div class="stat-label">Carbon Impact</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="industry-rank">--</div>
+        <div class="stat-label">Industry Rank</div>
+      </div>
+    </div>
+
+    <!-- Company Information Display -->
+    <div id="company-info" class="company-info" style="display: none;">
+      <!-- Company details will be populated by JS -->
+    </div>
+
+    <button id="checkButton" class="analyze-btn">
+      <i class="fas fa-leaf"></i>
+      <span>Analyze Sustainability</span>
+      <div class="btn-shine"></div>
+    </button>
+    
+    <div id="analysis-status" class="status-container" style="display: none;">
+      <div class="status-animation">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+      </div>
+      <p id="status-text">🔍 Analyzing sustainability practices...</p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Real-time Score Display -->
+    <div id="score-display" class="score-display" style="display: none;">
+      <div class="score-circle">
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#e0e0e0" stroke-width="8"/>
+          <circle cx="50" cy="50" r="45" fill="none" stroke-width="8" 
+                  stroke-linecap="round" class="score-arc" id="score-arc"/>
+        </svg>
+        <div class="score-number" id="score-number">--</div>
+        <div class="score-label-text">Sustainability Score</div>
+      </div>
+      
+      <div class="score-breakdown">
+        <div class="breakdown-item">
+          <span class="breakdown-label">Environmental</span>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill environmental" id="env-score"></div>
+          </div>
+          <span class="breakdown-value" id="env-value">--</span>
+        </div>
+        <div class="breakdown-item">
+          <span class="breakdown-label">Social</span>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill social" id="social-score"></div>
+          </div>
+          <span class="breakdown-value" id="social-value">--</span>
+        </div>
+        <div class="breakdown-item">
+          <span class="breakdown-label">Governance</span>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill governance" id="gov-score"></div>
+          </div>
+          <span class="breakdown-value" id="gov-value">--</span>
+        </div>
+        <div class="breakdown-item">
+          <span class="breakdown-label">Materials</span>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill materials" id="materials-score"></div>
+          </div>
+          <span class="breakdown-value" id="materials-value">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Analysis -->
+    <div id="detailed-analysis" style="display: none;">
+      <div class="analysis-header">
+        <h3>Detailed Analysis</h3>
+        <div class="confidence-badge" id="confidence-badge">
+          <i class="fas fa-shield-alt"></i>
+          <span id="confidence-text">High Confidence</span>
+        </div>
+      </div>
+      
+      <div class="analysis-content">
+        <div class="key-findings">
+          <h4><i class="fas fa-key"></i> Key Findings</h4>
+          <ul id="key-findings-list"></ul>
+        </div>
+        
+        <div class="improvement-suggestions">
+          <h4><i class="fas fa-lightbulb"></i> Improvement Opportunities</h4>
+          <ul id="improvement-list"></ul>
+        </div>
+        
+        <div class="certifications">
+          <h4><i class="fas fa-certificate"></i> Certifications Found</h4>
+          <div id="certifications-list" class="cert-badges"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Tab -->
+  <div class="tab-content" id="dashboard-tab">
+    <div class="dashboard-header">
+      <h3>Your Eco Dashboard</h3>
+      <div class="streak-counter">
+        <i class="fas fa-fire"></i>
+        <span id="streak-count">0</span> day streak
+      </div>
+    </div>
+    
+    <div class="achievements">
+      <h4>Recent Achievements</h4>
+      <div class="achievement-grid" id="achievement-grid">
+        <!-- Achievements will be populated by JS -->
+      </div>
+    </div>
+
+    <div class="charts-container">
+      <div class="chart-item">
+        <h4>Weekly Analysis Trend</h4>
+        <canvas id="trend-chart"></canvas>
+      </div>
+      <div class="chart-item">
+        <h4>Category Breakdown</h4>
+        <canvas id="category-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="carbon-tracker">
+      <h4><i class="fas fa-leaf"></i> Carbon Impact Tracker</h4>
+      <div class="carbon-stats">
+        <div class="carbon-stat">
+          <span class="carbon-value" id="daily-carbon">0 kg</span>
+          <span class="carbon-label">Today</span>
+        </div>
+        <div class="carbon-stat">
+          <span class="carbon-value" id="weekly-carbon">0 kg</span>
+          <span class="carbon-label">This Week</span>
+        </div>
+        <div class="carbon-stat">
+          <span class="carbon-value" id="monthly-carbon">0 kg</span>
+          <span class="carbon-label">This Month</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compare Tab -->
+  <div class="tab-content" id="compare-tab">
+    <div class="compare-header">
+      <h3>Sustainability Comparison</h3>
+      <button id="add-comparison" class="add-btn">
+        <i class="fas fa-plus"></i> Add Company
+      </button>
+    </div>
+    
+    <div class="comparison-grid" id="comparison-grid">
+      <!-- Comparison cards will be populated by JS -->
+    </div>
+    
+    <div class="benchmark-section">
+      <h4>Industry Benchmarks</h4>
+      <canvas id="benchmark-chart"></canvas>
+    </div>
+  </div>
+
+  <!-- History Tab -->
+  <div class="tab-content" id="history-tab">
+    <div class="history-header">
+      <h3>Analysis History</h3>
+      <div class="history-stats">
+        <span id="total-analyses">0 analyses</span>
+        <span id="avg-score">Avg: --</span>
+      </div>
+    </div>
+    
+    <div class="history-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="week">This Week</button>
+      <button class="filter-btn" data-filter="month">This Month</button>
+      <button class="filter-btn" data-filter="year">This Year</button>
+    </div>
+    
+    <div class="history-list" id="history-list">
+      <!-- History items will be populated by JS -->
+    </div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div class="tab-content" id="settings-tab">
+    <div class="settings-section">
+      <h4><i class="fas fa-key"></i> API Configuration</h4>
+      <div class="api-settings">
+        <div class="input-group">
+          <label for="openai-key">OpenAI API Key</label>
+          <input type="password" id="openai-key" placeholder="sk-proj-..." />
+          <button id="test-openai" class="test-btn">Test</button>
+        </div>
+        <div class="input-group">
+          <label for="anthropic-key">Anthropic API Key (Optional)</label>
+          <input type="password" id="anthropic-key" placeholder="sk-ant-..." />
+          <button id="test-anthropic" class="test-btn">Test</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h4><i class="fas fa-bell"></i> Notifications</h4>
+      <div class="setting-item">
+        <label class="switch">
+          <input type="checkbox" id="daily-reminder" checked>
+          <span class="slider"></span>
+        </label>
+        <span>Daily sustainability reminders</span>
+      </div>
+      <div class="setting-item">
+        <label class="switch">
+          <input type="checkbox" id="achievement-notifications" checked>
+          <span class="slider"></span>
+        </label>
+        <span>Achievement notifications</span>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h4><i class="fas fa-chart-bar"></i> Analysis Preferences</h4>
+      <div class="setting-item">
+        <label for="analysis-depth">Analysis Depth</label>
+        <select id="analysis-depth">
+          <option value="quick">Quick (30s)</option>
+          <option value="standard" selected>Standard (60s)</option>
+          <option value="deep">Deep (120s)</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label class="switch">
+          <input type="checkbox" id="auto-analyze" checked>
+          <span class="slider"></span>
+        </label>
+        <span>Auto-analyze on page load</span>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h4><i class="fas fa-download"></i> Data Management</h4>
+      <div class="data-buttons">
+        <button id="export-data" class="secondary-btn">
+          <i class="fas fa-download"></i> Export Data
+        </button>
+        <button id="clear-data" class="danger-btn">
+          <i class="fas fa-trash"></i> Clear All Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Action Button for Quick Actions -->
+  <div class="fab-container">
+    <button class="fab" id="quick-fab">
+      <i class="fas fa-bolt"></i>
+    </button>
+    <div class="fab-menu" id="fab-menu">
+      <button class="fab-item" id="quick-analyze">
+        <i class="fas fa-search"></i>
+        <span>Quick Analyze</span>
+      </button>
+      <button class="fab-item" id="share-score">
+        <i class="fas fa-share"></i>
+        <span>Share Score</span>
+      </button>
+      <button class="fab-item" id="suggest-improvement">
+        <i class="fas fa-lightbulb"></i>
+        <span>Get Tips</span>
+      </button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+  <script src="dashboard.js"></script>
+  <script src="gamification.js"></script>
+  <script src="visualization.js"></script>
+  <script src="lib/chart.umd.js"></script>
+</body>
+</html>

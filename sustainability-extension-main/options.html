@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>EcoGuard Pro - Options</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="options-container">
+    <h1>🌱 EcoGuard Pro - Settings</h1>
+    
+    <div class="settings-section">
+      <h3>API Configuration</h3>
+      <label for="openai-api-key">OpenAI API Key:</label>
+      <input type="password" id="openai-api-key" placeholder="sk-proj-...">
+      <button id="save-openai-key">Save</button>
+      <div id="openai-status"></div>
+    </div>
+    
+    <div class="settings-section">
+      <h3>Analysis Preferences</h3>
+      <label for="analysis-depth">Analysis Depth:</label>
+      <select id="analysis-depth">
+        <option value="quick">Quick (30s)</option>
+        <option value="standard" selected>Standard (60s)</option>
+        <option value="deep">Deep (120s)</option>
+      </select>
+    </div>
+    
+    <div class="settings-section">
+      <h3>Notifications</h3>
+      <label>
+        <input type="checkbox" id="daily-reminders" checked>
+        Daily sustainability reminders
+      </label>
+      <label>
+        <input type="checkbox" id="achievement-notifications" checked>
+        Achievement notifications
+      </label>
+    </div>
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html> 
