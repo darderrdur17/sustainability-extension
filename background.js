@@ -85,24 +85,24 @@ RESPONSE FORMAT (REQUIRED):
 Overall Score: XX / 100
 
 DETAILED BREAKDOWN:
-Environmental: XX/25 - [brief analysis]
-Social: XX/25 - [brief analysis]
-Governance: XX/25 - [brief analysis]
-Materials: XX/25 - [brief analysis]
+Environmental: XX/25 - Brief explanation of environmental practices and impact
+Social: XX/25 - Brief explanation of social responsibility and labor practices  
+Governance: XX/25 - Brief explanation of corporate governance and transparency
+Materials: XX/25 - Brief explanation of materials sourcing and sustainability
 
 KEY FINDINGS:
-• [Finding 1]
-• [Finding 2]
-• [Finding 3]
+• Specific finding about company's sustainability practices
+• Another concrete finding about their environmental impact
+• Third finding about their social or governance practices
 
 IMPROVEMENTS NEEDED:
-• [Improvement 1]
-• [Improvement 2]
-• [Improvement 3]
+• Specific improvement recommendation
+• Another actionable improvement suggestion
+• Third improvement area identified
 
-CERTIFICATIONS FOUND: [list any certifications mentioned]
+CERTIFICATIONS FOUND: List any certifications like B-Corp, LEED, Fair Trade, etc.
 
-CONFIDENCE: [High/Medium/Low] - [brief reason]`
+CONFIDENCE: High/Medium/Low - Explain reasoning for confidence level`
           },
           { role: "user", content: combinedAnalysisText }
         ],
